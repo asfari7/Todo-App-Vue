@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo list app</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/64e956db2a.js" crossorigin="anonymous"></script>
+    <style>
+        .v-enter-active,
+        .v-leave-active {
+            transition: opacity 0.5s ease;
+        }
+
+        .v-enter-from,
+        .v-leave-to {
+            opacity: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <main class="container w-50 mt-5">
+            <h1 class="mb-5">Todo list app</h1>
+
+
+            <div class="mb-5 d-flex gap-3">
+                <input type="text" class="form-control" id="todo" v-model="todo">
+                <button type="submit" class="btn btn-primary" @click.prevent="addTodo">Add</button>
+            </div>
+
+            <transition class="text-center">
+                <section v-show="todos.filter(t => t.completed === false).length === 0">
+                    <img class="mb-4" src="to-do-list.png" style="width: 25%;">
+                    <h4 class="mb-5">No Task Active</h4>
+                </section>
+            </transition>
+
+            <transition>
+                <section v-show="todos.filter(t => t.completed === false).length">
+                    <h4 class="mb-4">Ongoing tasks</h4>
+
+                    <ul style="list-style: none; padding: 0">
+                        <li class="mb-3" v-for="(todo, index) in todos.filter(todo => todo.completed === false)"
+                            :key="index">
+                            <div class="d-flex gap-3 align-items-center justify-content-between">
+                                <div class="d-flex gap-4 align-items-center" @click="todo.completed = !todo.completed">
+                                    <i class="fa-solid fa-check" style="color: #7c7c7c; cursor: pointer"></i>
+                                    <p class="fs-5 m-0" style="cursor: pointer">{{
+                                        todo.title }}</p>
+                                </div>
+                                <div class="d-flex gap-3">
+                                    <button class="btn btn-outline-primary" @click="editTodo(todos.indexOf(todo))"><i
+                                            class="fa-solid fa-pencil" style="color: #74C0FC;"></i></button>
+                                    <button class="btn btn-outline-danger" @click="deleteTodo(todos.indexOf(todo))"><i
+                                            class="fa-solid fa-trash" style="color: #f32040;"
+                                            id="trashIco"></i></button>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </transition>
+
+            <transition>
+                <section v-show="todos.filter(t => t.completed === true).length">
+                    <h4 class="mb-4">Completed tasks <i class="fa-solid fa-circle-check" style="color: #63E6BE;"></i>
+                    </h4>
+
+                    <ul style="list-style: none; padding: 0">
+                        <li class="mb-3" v-for="(todo, index) in todos.filter(todo => todo.completed === true)"
+                            :key="index">
+                            <div class="d-flex gap-3 align-items-center justify-content-between">
+                                <div class="d-flex gap-4 align-items-center">
+                                    <i class="fa-solid fa-check" style="color: #74C0FC; cursor: pointer"
+                                        @click="todo.completed = !todo.completed"></i>
+                                    <p class="fs-5 m-0 text-decoration-line-through text-muted">{{ todo.title }}</p>
+                                </div>
+                                <div class="d-flex gap-3">
+                                    <button class="btn btn-outline-danger" @click="deleteTodo(todos.indexOf(todo))"><i
+                                            class="fa-solid fa-trash" style="color: #f32040;"></i></button>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </transition>
+
+        </main>
+    </div>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    todos: [
+
+                        {
+                            title: '',
+                            completed: null
+                        },
+
+                    ],
+                    todo: '',
+                    editedTodo: null,
+                }
+
+
+            },
+            methods: {
+                addTodo() {
+                    if (!this.todo) return;
+
+                    if (this.editedTodo === null) {
+                        this.todos.push({
+                            title: this.todo,
+                            completed: false
+                        })
+                        this.todo = ''
+                    } else {
+                        this.todos[this.editedTodo].title = this.todo
+                        this.todo = ''
+                        this.editedTodo = null
+                    }
+                },
+
+                editTodo(index) {
+                    this.todo = this.todos[index].title
+                    this.editedTodo = index
+                },
+
+                deleteTodo(index) {
+                    this.todos.splice(index, 1)
+                    this.editedTodo = null
+                },
+            }
+        })
+        app.mount('#app')
+    </script>
+</body>
+
+</html>
